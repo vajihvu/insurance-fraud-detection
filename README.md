@@ -29,5 +29,4 @@ This repository contains an end-to-end machine learning pipeline to detect fraud
 - Use SMOTENC or advanced encodings for mixed categorical features.
 - Add time-aware validation (if claims are time-series).
 - Hyperparameter optimization with Optuna.
-
-Package as an API using FastAPI, containerize with Docker, and add CI/CD & model monitoring (MLflow).
+- Package as an API using FastAPI, containerize with Docker, and add CI/CD & model monitoring (MLflow).
