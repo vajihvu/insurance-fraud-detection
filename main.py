@@ -80,10 +80,16 @@ def main():
             logger.info("Computing SHAP values for XGBoost (this may take a while)...")
             n_samples = min(args.shap_max_samples, X_test_prep.shape[0])
             X_shap = X_test_prep[:n_samples]
-            explainer = shap.TreeExplainer(xgb_model)
+            # Use the booster directly to avoid attribute parsing issues in some SHAP versions
+            booster = xgb_model.get_booster()
+            explainer = shap.TreeExplainer(booster)
             shap_values = explainer.shap_values(X_shap)
-            plt.figure(figsize=(8, 6))
-            shap.summary_plot(shap_values, X_shap, show=False)
+            
+            plt.figure(figsize=(10, 8))
+            # Get feature names from the preprocessor if possible
+            feature_names = preprocessor.get_feature_names_out() if hasattr(preprocessor, "get_feature_names_out") else None
+            shap.summary_plot(shap_values, X_shap, feature_names=feature_names, show=False)
+            
             shap_path = os.path.join(args.out_dir, "shap_summary_xgb.png")
             plt.tight_layout()
             plt.savefig(shap_path, dpi=150)

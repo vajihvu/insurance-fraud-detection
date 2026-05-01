@@ -40,7 +40,7 @@ def build_preprocessor(
 
     categorical_transformer = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy=categorical_strategy)),
-        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse=False))
+        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False))
     ])
 
     transformers = []
@@ -65,7 +65,11 @@ def preprocess_split(
         df = df.drop(columns=drop_cols)
 
     X = df.drop(columns=[label_col])
-    y = df[label_col].astype(int)
+    
+    # Handle categorical labels (e.g., 'Y'/'N', 'Yes'/'No')
+    y_raw = df[label_col].astype(str).str.strip().str.lower()
+    positive_values = {'y', 'yes', '1', 'true', 't', 'fraud', 'fraudulent'}
+    y = y_raw.map(lambda x: 1 if x in positive_values else 0).astype(int)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, stratify=y, test_size=test_size, random_state=random_state)
 
